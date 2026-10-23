@@ -1,0 +1,8 @@
+# dsh-glm-quota 的 bundle patch。
+#
+# 这个文件让本包成为 profile 的「一层」而不是一个装了不响应的依赖：
+# 安装后 DSH 把 dsh.profile.bundles 与已安装包对账，声明了
+# dsh.bundle.patch 的依赖会进入 layer 栈，下面这一行 insert 把插件挂上。
+- insert:
+    - id: dsh-glm-quota
+      name: dsh-glm-quota
