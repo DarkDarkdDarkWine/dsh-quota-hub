@@ -1,11 +1,12 @@
 # dsh-glm-quota
 
-在 DSH 里盯住 Coding Plan 的额度：目前支持 **GLM Coding Plan**（智谱）、**MiniMax Token Plan** 与 **Kimi Code**（月之暗面）。聊天输入框右下角（切到对应模型时）一组窗口胶囊，侧边栏底部各家一枚百分比徽标，设置里「额度监控」一页完整面板。默认复用你已经配好的模型 Key（`ZAI_CODING_CN_API_KEY` / `MINIMAX_CN_API_KEY` / `KIMI_CODING_API_KEY`），不需要重新填。
+在 DSH 里盯住 Coding Plan 的额度：目前支持 **GLM Coding Plan**（智谱）、**MiniMax Token Plan**、**Kimi Code**（月之暗面）与 **DeepSeek**（余额+今日花费）。聊天输入框右下角（切到对应模型时）一组窗口胶囊，侧边栏底部各家一枚百分比徽标，设置里「额度监控」一页完整面板。默认复用你已经配好的模型 Key（`ZAI_CODING_CN_API_KEY` / `MINIMAX_CN_API_KEY` / `KIMI_CODING_API_KEY` / `DEEPSEEK_API_KEY`），不需要重新填。
 
 ```
 聊天输入框右下角（GLM 模型时）：  ● GLM 5 小时 42%  ● GLM 每周 7%
                                   （MiniMax 模型时）：● MM 5 小时 60%  ● MM 每周 50%
                                   （Kimi 模型时）：  ● Kimi 5 小时 0%  ● Kimi 每周 0%
+                                  （DeepSeek 模型时）：● DS ¥87.48 · 今日 ¥0.15
 侧边栏底部：  ● GLM 42% | MM 60% | Kimi 0%   点一下 = 立即刷新，悬停看各家窗口明细
 设置 → 额度监控：每家一组卡片（套餐 / 窗口进度 / 模型明细 / 区域 / Key / 停用开关）
 ```
@@ -42,7 +43,16 @@
 
 注意：Kimi 的用量接口（`GET https://api.kimi.com/coding/v1/usages`）校验客户端 UA，插件会伪装成 `KimiCLI/1.6`；旧版响应（`usage`/`limits` 字段）也做了兜底解析。
 
-徽标显示的是**最紧张的那个窗口**（已用百分比最高）。颜色随水位变化：`<70%` 正常、`≥70%` 警示、`≥90%` 标红。侧边栏收成 56px 导轨时只留彩点。
+### DeepSeek（按量付费）
+
+| 项目 | 来源 | 说明 |
+| --- | --- | --- |
+| 账户余额 | `api.deepseek.com/user/balance`（官方） | 充值/赠送/总余额 |
+| 今日花费 | 本地估算 | 会话日志 token × 价格表，**非账单** |
+
+注意：DeepSeek 官方不提供"今日已消费"查询接口，今日花费是**本地估算口径**——插件监听本机 DSH 会话日志，把每次请求的 token（缓存命中/未命中/输出/推理）按价格表（元/百万 token）折算；只统计经过本 DSH 的 DeepSeek 请求，其他平台的调用不计入。价格表可在 `$DSH_HOME/glm-quota/config.json` 的 `providers.deepseek.prices` 覆盖（默认 `deepseek-chat` 0.5/2/8、`deepseek-reasoner` 0.5/2/16）。数据保留 7 天（`ledger.json`，按 sessionId:seq 幂等去重，重复扫描不会重复计数）。
+
+徽标显示的是**最紧张的那个窗口**（已用百分比最高；DeepSeek 无窗口，显示余额）。颜色随水位变化：`<70%` 正常、`≥70%` 警示、`≥90%` 标红。侧边栏收成 56px 导轨时只留彩点。
 
 聊天框右下角的胶囊（`conversation.composer.dock`）**只在当前会话使用对应模型时出现**：GLM 模型（provider/name 匹配 `zai|bigmodel|zhipu|glm`）显示 GLM 额度，MiniMax 模型（匹配 `minimax|abab`）显示 MiniMax 额度，Kimi 模型（匹配 `kimi|moonshot`）显示 Kimi 额度，切到其他模型自动隐藏。
 
