@@ -1,5 +1,5 @@
 {
-  "name": "dsh-glm-quota",
+  "name": "dsh-quota-hub",
   "version": "0.1.0",
   "description": "监控 GLM Coding Plan 额度：侧边栏徽标 + 设置页，支持国内版与国际版，复用 ZAI_CODING_CN_API_KEY。",
   "type": "module",

@@ -1,4 +1,4 @@
-# dsh-glm-quota
+# dsh-quota-hub
 
 在 DSH 里盯住 Coding Plan 的额度：目前支持 **GLM Coding Plan**（智谱）、**MiniMax Token Plan**、**Kimi Code**（月之暗面）与 **DeepSeek**（余额+今日花费）。聊天输入框右下角（切到对应模型时）一组窗口胶囊，侧边栏底部各家一枚百分比徽标，设置里「额度监控」一页完整面板。默认复用你已经配好的模型 Key（`ZAI_CODING_CN_API_KEY` / `MINIMAX_CN_API_KEY` / `KIMI_CODING_API_KEY` / `DEEPSEEK_API_KEY`），不需要重新填。
 
@@ -52,7 +52,7 @@
 | 当前定价区间 | 官方规则实时计算 | 高峰 / 错峰（半价），含今日峰/谷请求数拆分 |
 | 模型定价 | 官方价格表 | flash 与 v4-pro 的命中/未命中/输出价 |
 
-注意：DeepSeek 官方不提供"今日已消费"查询接口，今日花费是**本地估算口径**——插件监听本机 DSH 会话日志，把每次请求的 token（缓存命中/未命中/输出/推理）按价格表（元/百万 token）折算；只统计经过本 DSH 的 DeepSeek 请求，其他平台的调用不计入。峰谷规则（官方）：**UTC 周一至周五 01:00–04:00 与 06:00–10:00 为高峰**，其余时段（含整个周末）错峰半价；中国法定节假日豁免未内置。价格单位 USD/1M token：`deepseek-flash` 命中 $0.006 / 未命中 $0.30 / 输出 $1.20，`deepseek-v4-pro` $0.044 / $1.32 / $3.96；可在 `$DSH_HOME/glm-quota/config.json` 的 `providers.deepseek.prices` 覆盖。数据保留 7 天（`ledger.json`，按 sessionId:seq 幂等去重，重复扫描不会重复计数）。
+注意：DeepSeek 官方不提供"今日已消费"查询接口，今日花费是**本地估算口径**——插件监听本机 DSH 会话日志，把每次请求的 token（缓存命中/未命中/输出/推理）按价格表（元/百万 token）折算；只统计经过本 DSH 的 DeepSeek 请求，其他平台的调用不计入。峰谷规则（官方）：**UTC 周一至周五 01:00–04:00 与 06:00–10:00 为高峰**，其余时段（含整个周末）错峰半价；中国法定节假日豁免未内置。价格单位 USD/1M token：`deepseek-flash` 命中 $0.006 / 未命中 $0.30 / 输出 $1.20，`deepseek-v4-pro` $0.044 / $1.32 / $3.96；可在 `$DSH_HOME/dsh-quota-hub/config.json` 的 `providers.deepseek.prices` 覆盖。数据保留 7 天（`ledger.json`，按 sessionId:seq 幂等去重，重复扫描不会重复计数）。
 
 徽标固定为一枚：**只显示最紧张的那家**（已用百分比最高，DeepSeek 这类无窗口的显示余额）+ `+N` 尾标标出其余家数——无论聚合多少家都不会变宽。点击徽标弹出各家列表浮卡，再点某家进入它的详情面板。
 
@@ -67,7 +67,7 @@
 在本仓库目录下（插件源码即安装目标，改完即时生效）：
 
 ```bash
-dsh plugin --profile web add /path/to/dsh-glm-quota
+dsh plugin --profile web add /path/to/dsh-quota-hub
 ```
 
 宿主端会随下一条消息热加载；界面端若没立刻出现，刷新一次窗口即可。
@@ -75,7 +75,7 @@ dsh plugin --profile web add /path/to/dsh-glm-quota
 卸载：
 
 ```bash
-dsh plugin --profile web remove dsh-glm-quota
+dsh plugin --profile web remove dsh-quota-hub
 ```
 
 ## 配置
@@ -87,11 +87,11 @@ dsh plugin --profile web remove dsh-glm-quota
 - **刷新间隔**（全局）—— 60 秒 ~ 30 分钟，默认 120 秒。宿主端按此间隔轮询，界面 30 秒读一次缓存。
 - **API Key** —— 默认自动复用模型配置里的凭证（GLM 用 `ZAI_CODING_CN_API_KEY`；MiniMax 国内版用 `MINIMAX_CN_API_KEY`、国际版用 `MINIMAX_API_KEY`）。已配好时面板会直接显示"✓ 已自动复用凭证"，**不需要再填**；只有想换 Key 时才点「使用其他 Key…」。粘贴走 DSH 凭证服务，落盘位置与其它 Key 一致。
 
-配置存在 `$DSH_HOME/glm-quota/config.json`（v2，provider 维度；旧版扁平配置自动迁移）；Key 不进这个文件。
+配置存在 `$DSH_HOME/dsh-quota-hub/config.json`（v2，provider 维度；旧版扁平配置自动迁移）；Key 不进这个文件。
 
 ## 隐私与开销
 
-- Key 只在宿主端使用，界面端只读 `/dsh-glm-quota/status.json`，永远拿不到明文 Key。
+- Key 只在宿主端使用，界面端只读 `/dsh-quota-hub/status.json`，永远拿不到明文 Key。
 - GLM 每次查询打两个 `GET`（额度 + 订阅，订阅失败不影响额度显示）；MiniMax 打一个 `GET`（主域名失败自动换备用域名重试）。
 - 快照缓存 30 秒（错误快照 10 秒，方便配好 Key 后自愈）；每家 provider 独立缓存，同一时刻只允许一个在途请求。
 - 界面端 30 秒轮询本地路由，**不直接访问外网**。
