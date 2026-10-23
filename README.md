@@ -67,7 +67,8 @@
 在本仓库目录下（插件源码即安装目标，改完即时生效）：
 
 ```bash
-dsh plugin --profile web add /path/to/dsh-quota-hub
+dsh plugin --profile web add github:DarkDarkdDarkWine/dsh-quota-hub  # 在线安装（GitHub 直装）
+# 或本地开发：dsh plugin --profile web add <本地路径>/dsh-quota-hub
 ```
 
 宿主端会随下一条消息热加载；界面端若没立刻出现，刷新一次窗口即可。
