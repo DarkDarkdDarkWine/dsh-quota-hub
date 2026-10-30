@@ -1,22 +1,26 @@
 {
   "name": "dsh-quota-hub",
   "version": "0.1.0",
-  "description": "监控 GLM Coding Plan 额度：侧边栏徽标 + 设置页，支持国内版与国际版，复用 ZAI_CODING_CN_API_KEY。",
+  "description": "DeepSeek Harness plugin: aggregated coding-plan quota monitor (GLM / MiniMax / Kimi / DeepSeek) with per-provider detail panels, chat dock pills and a sidebar badge.",
   "type": "module",
   "main": "./lib/index.js",
   "files": [
     "lib",
     "cordis.patch.yml",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "license": "MIT",
   "keywords": [
     "dsh",
+    "deepseek-harness",
     "dsh-plugin",
-    "glm",
-    "zai",
     "quota",
-    "coding-plan"
+    "coding-plan",
+    "glm",
+    "minimax",
+    "kimi",
+    "deepseek"
   ],
   "engines": {
     "node": ">=20"
@@ -37,5 +41,12 @@
       ],
       "platform": "web"
     }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DarkDarkdDarkWine/dsh-quota-hub.git"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
